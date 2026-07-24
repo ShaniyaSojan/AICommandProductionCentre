@@ -1,0 +1,11 @@
+{
+    "projects": [
+        {
+            "name": "ICCS",
+            "production_epic": "RICCS-9",
+            "team": "ICCS Support",
+            "sla_hours": 48,
+            "enabled": true
+        }
+    ]
+}
