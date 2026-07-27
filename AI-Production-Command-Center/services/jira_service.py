@@ -17,6 +17,7 @@ class JiraService:
             "Content-Type": "application/json"
         }
 
+
     def get_production_tickets(self, epic):
         url = f"{self.base_url}/rest/api/3/search/jql"
         payload = {
@@ -33,7 +34,11 @@ class JiraService:
                 "created",
                 "updated",
                 "resolutiondate",
-                "comment"
+                "customer",
+                "severity",
+                "comment",
+                "customfield_10348", #Customer/Bank
+                "customfield_10049", #Severity
             ]
         }
         response = requests.post(
@@ -71,10 +76,44 @@ class JiraService:
                 "CreatedDate": parse_jira_datetime(fields.get("created")),
                 "UpdatedDate": parse_jira_datetime(fields.get("updated")),
                 "ResolutionDate": parse_jira_datetime(fields.get("resolutiondate")),
-                "Comments": fields.get("comment", {}).get("comments", [])
+                "Customer": fields.get("customer"),
+                "Severity": fields.get("severity"),
+                "Comments": self.parse_comments(fields.get("comment", {}).get("comments", [])),
+                "Customer": (
+                    fields.get("customfield_10348", {}).get("value")
+                    if fields.get("customfield_10348")
+                    else None
+                ),
+
+                "Severity": (
+                    fields.get("customfield_10049", {}).get("value")
+                    if fields.get("customfield_10049")
+                    else None
+                ),
             }
             tickets.append(ticket)
         return tickets
+
+    def get_ticket_comments(self, issue_key: str):
+        url = f"{self.base_url}/rest/api/3/issue/{issue_key}/comment"
+        response = requests.get(
+            url,
+            auth=self.auth,
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json().get("comments", [])
+    def parse_comments(self, comments):
+        parsed_comments = []
+        for comment in comments:
+            parsed_comments.append({
+                "JiraCommentID": comment["id"],
+                "AuthorName": comment["author"]["displayName"],
+                "CommentText": extract_text(comment["body"]),
+                "CreatedDate": parse_jira_datetime(comment["created"]),
+                "UpdatedDate": parse_jira_datetime(comment["updated"])
+            })
+        return parsed_comments
 
 
 def extract_text(node):
@@ -90,3 +129,4 @@ def extract_text(node):
         for item in node:
             text += extract_text(item)
     return text
+

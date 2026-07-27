@@ -29,7 +29,9 @@ class TicketRepository:
                     UpdatedDate,
                     ResolutionDate,
                     LastSynced,
-                    IsActive
+                    IsActive,
+                    Customer,
+                    Severity
 
                     FROM Tickets
 
@@ -68,7 +70,9 @@ class TicketRepository:
                     UpdatedDate,
                     ResolutionDate,
                     LastSynced,
-                    IsActive
+                    IsActive,
+                    Customer,
+                    Severity
                 )
 
                 VALUES
@@ -88,7 +92,9 @@ class TicketRepository:
                     :UpdatedDate,
                     :ResolutionDate,
                     GETDATE(),
-                     1
+                     1,
+                    :Customer,
+                    :Severity   
                 )
 
                 """),
@@ -100,48 +106,40 @@ class TicketRepository:
             db.commit()
 
     def update_ticket(self, ticket):
-
         with get_db() as db:
             try:  
-        
                 db.execute(
-
                     text("""
-
                     UPDATE Tickets
-
                     SET
                         Summary=:Summary,
-
                         Description=:Description,
-
                         Status=:Status,
-
                         Priority=:Priority,
-
                         Assignee=:Assignee,
-
                         Reporter=:Reporter,
-
                         UpdatedDate=:UpdatedDate,
-
                         ResolutionDate=:ResolutionDate,
-
-                        LastSynced=GETDATE()
-
+                        LastSynced=GETDATE(),
+                        Customer=:Customer,
+                        Severity=:Severity          
                     WHERE
-
                         IssueKey=:IssueKey
-
                     """),
-
                     ticket
-
                 )
-
                 db.commit()
             except Exception:
-
                 db.rollback()
-
                 raise
+
+    def get_all_tickets(self):
+        with get_db() as db:
+            result = db.execute(
+                text("""
+                    SELECT *
+                    FROM Tickets
+                    WHERE IsActive = 1
+                """)
+            )
+            return result.mappings().all()

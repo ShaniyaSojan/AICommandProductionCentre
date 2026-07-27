@@ -11,12 +11,9 @@ project_service = ProjectService()
 
 @router.get("/{project_name}/tickets")
 def get_jira_tickets(project_name: str):
-
     project = project_service.get_project(project_name)
-
     if not project:
         return {"error": "Project not found"}
-
     return jira.get_production_tickets(
         project["ProductionEpic"]
     )
