@@ -80,14 +80,14 @@ class JiraService:
                 "Severity": fields.get("severity"),
                 "Comments": self.parse_comments(fields.get("comment", {}).get("comments", [])),
                 "Customer": (
-                    fields.get("customfield_10348", {}).get("value")
-                    if fields.get("customfield_10348")
+                    fields.get("JiraFields.CUSTOMER", {}).get("value")
+                    if fields.get("JiraFields.CUSTOMER")
                     else None
                 ),
 
                 "Severity": (
-                    fields.get("customfield_10049", {}).get("value")
-                    if fields.get("customfield_10049")
+                    fields.get("JiraFields.SEVERITY", {}).get("value")
+                    if fields.get("JiraFields.SEVERITY")
                     else None
                 ),
             }
