@@ -19,10 +19,11 @@ class JiraService:
         }
 
 
-    def get_production_tickets(self, epic):
+    def get_production_tickets(self, epics: list):
+        epic_list = ", ".join(epics)
         url = f"{self.base_url}/rest/api/3/search/jql"
         payload = {
-            "jql": f"parent = {epic} ORDER BY Rank",
+            "jql": f"parent in ({epic_list}) ORDER BY Rank",
             "maxResults": 100,
             "fields": [
                 "summary",
@@ -35,8 +36,7 @@ class JiraService:
                 "created",
                 "updated",
                 "resolutiondate",
-                "customer",
-                "severity",
+                "parent",
                 "comment",
                 JiraFields.CUSTOMER, #Customer/Bank
                 JiraFields.SEVERITY, #Severity
@@ -77,6 +77,7 @@ class JiraService:
                 "CreatedDate": parse_jira_datetime(fields.get("created")),
                 "UpdatedDate": parse_jira_datetime(fields.get("updated")),
                 "ResolutionDate": parse_jira_datetime(fields.get("resolutiondate")),
+                "EpicKey": fields.get("parent", {}).get("key"),
                 "Comments": self.parse_comments(fields.get("comment", {}).get("comments", [])),
                 "Customer": (
                     fields.get(JiraFields.CUSTOMER, {}).get("value")

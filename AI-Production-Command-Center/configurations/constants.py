@@ -30,7 +30,6 @@ class JiraFields:
 
 class JiraStatus:
 
-
     CLOSED = "Closed"
     DONE = "Done"
     RESOLVED = "Resolved"
@@ -52,6 +51,31 @@ class JiraStatus:
         "READY FOR QA",
         "IN QA TESTING",
     ]
+
+    # Hex colors for status distribution chart (keys are lowercase for case-insensitive lookup)
+    # Closed/resolved statuses → green; active/in-progress statuses → blue
+    STATUS_COLORS = {
+        "closed":              "#22c55e",
+        "done":                "#22c55e",
+        "resolved":            "#22c55e",
+        "rejected":            "#22c55e",
+        "duplicate":           "#22c55e",
+        "open":                "#3b82f6",
+        "dev - in progress":   "#3b82f6",
+        "code review":         "#3b82f6",
+        "ready for qa":        "#3b82f6",
+        "in qa testing":       "#3b82f6",
+        "sit signoff":         "#eab308",
+        "uat deployed":        "#eab308",
+        "uat signoff":         "#eab308",
+        "in uat testing":      "#eab308",
+        "released to prod":    "#eab308",
+        "pending with bank":   "#eab308",
+        "in sit testing":      "#eab308",
+    }
+
+    # Fallback color for any status not listed above
+    DEFAULT_STATUS_COLOR = "#6b7280"
 
 
 # ===========================================================
@@ -129,6 +153,8 @@ class Sync:
 class Tables:
 
     PROJECTS = "Projects"
+
+    EPICS = "ProjectEpics"
 
     TICKETS = "Tickets"
 

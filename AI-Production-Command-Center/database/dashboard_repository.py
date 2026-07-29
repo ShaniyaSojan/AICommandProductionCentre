@@ -41,6 +41,7 @@ class DashboardRepository:
                 FROM Tickets
                 WHERE IsActive = 1
                 AND Priority = '{JiraPriority.P0}'
+                AND Status  IN ('{self.active_status}')
             """)).scalar()
 
             sla = conn.execute(text(f"""
@@ -78,7 +79,10 @@ class DashboardRepository:
                 ORDER BY Count DESC
             """)).mappings().all()
 
-            return [dict(row) for row in rows]
+            return [
+                {**dict(row), "Color": JiraStatus.STATUS_COLORS.get(row["Status"].lower(), JiraStatus.DEFAULT_STATUS_COLOR)}
+                for row in rows
+            ]
 
     # =====================================================
     # Priority Distribution
@@ -162,4 +166,7 @@ class DashboardRepository:
                 ORDER BY UpdatedDate DESC
             """)).mappings().all()
 
-            return [dict(row) for row in rows]
+            return [
+                {**dict(row), "Color": JiraStatus.STATUS_COLORS.get(row["Status"].lower(), JiraStatus.DEFAULT_STATUS_COLOR)}
+                for row in rows
+            ]

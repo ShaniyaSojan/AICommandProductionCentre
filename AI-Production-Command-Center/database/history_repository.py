@@ -54,3 +54,25 @@ class HistoryRepository:
 
                 db.rollback()
                 raise
+
+    def get_history(self, issue_key):
+
+        with get_db() as db:
+
+            result = db.execute(
+                text("""
+                    SELECT
+                        TicketID,
+                        IssueKey,
+                        FieldName,
+                        OldValue,
+                        NewValue,
+                        ChangedOn
+                    FROM TicketHistory
+                    WHERE IssueKey = :issue_key
+                    ORDER BY ChangedOn DESC
+                """),
+                {"issue_key": issue_key}
+            )
+
+            return [dict(row) for row in result.mappings().all()]

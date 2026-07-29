@@ -25,9 +25,15 @@ def synchronize_project(project_name: str):
             "Message": "Project not found"
         }
 
-    tickets = jira_service.get_production_tickets(
-        project["ProductionEpic"]
-    )
+    epics = project_service.get_project_epics(project["ProjectID"])
+
+    if not epics:
+        return {
+            "Success": False,
+            "Message": "No epics configured for this project"
+        }
+
+    tickets = jira_service.get_production_tickets(epics)
 
     inserted = 0
     updated = 0
@@ -38,7 +44,6 @@ def synchronize_project(project_name: str):
     for ticket in tickets:
 
         ticket["ProjectID"] = project["ProjectID"]
-        ticket["EpicKey"] = project["ProductionEpic"]
 
         result = sync_service.synchronize(ticket)
 

@@ -1,6 +1,7 @@
 from sqlalchemy import text
 
 from database.connection import get_db
+from configurations.constants import JiraStatus, JiraPriority, Dashboard
 
 
 class TicketRepository:
@@ -143,3 +144,31 @@ class TicketRepository:
                 """)
             )
             return result.mappings().all()
+
+    def get_filtered_tickets(self, filter_type: str):
+        active = "', '".join(JiraStatus.ACTIVE_STATUS)
+
+        filters = {
+            "open": f"Status IN ('{active}')",
+            "p1-critical": f"Priority = '{JiraPriority.P0}' AND IsActive = 1",
+            "resolved-today": "CAST(ResolutionDate AS DATE) = CAST(GETDATE() AS DATE)",
+            "sla-at-risk": (
+                f"Status IN ('{active}') "
+                f"AND DATEDIFF(HOUR, CreatedDate, GETDATE()) >= {Dashboard.SLA_WARNING_HOURS}"
+            ),
+        }
+
+        where = filters.get(filter_type, "IsActive = 1")
+
+        with get_db() as db:
+            rows = db.execute(text(f"""
+                SELECT IssueKey, Summary, Status, Priority, Customer, Assignee, UpdatedDate
+                FROM Tickets
+                WHERE {where}
+                ORDER BY UpdatedDate DESC
+            """)).mappings().all()
+
+        return [
+            {**dict(row), "Color": JiraStatus.STATUS_COLORS.get(row["Status"].lower(), JiraStatus.DEFAULT_STATUS_COLOR)}
+            for row in rows
+        ]
