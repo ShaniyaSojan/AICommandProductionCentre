@@ -3,6 +3,7 @@ from requests.auth import HTTPBasicAuth
 from config import Config
 from utils.logger import logger
 from utils.datetime_helper import parse_jira_datetime
+from configurations.constants import JiraFields
 
 class JiraService:
 
@@ -37,8 +38,8 @@ class JiraService:
                 "customer",
                 "severity",
                 "comment",
-                "customfield_10348", #Customer/Bank
-                "customfield_10049", #Severity
+                JiraFields.CUSTOMER, #Customer/Bank
+                JiraFields.SEVERITY, #Severity
             ]
         }
         response = requests.post(
@@ -76,18 +77,16 @@ class JiraService:
                 "CreatedDate": parse_jira_datetime(fields.get("created")),
                 "UpdatedDate": parse_jira_datetime(fields.get("updated")),
                 "ResolutionDate": parse_jira_datetime(fields.get("resolutiondate")),
-                "Customer": fields.get("customer"),
-                "Severity": fields.get("severity"),
                 "Comments": self.parse_comments(fields.get("comment", {}).get("comments", [])),
                 "Customer": (
-                    fields.get("JiraFields.CUSTOMER", {}).get("value")
-                    if fields.get("JiraFields.CUSTOMER")
+                    fields.get(JiraFields.CUSTOMER, {}).get("value")
+                    if fields.get(JiraFields.CUSTOMER)
                     else None
                 ),
 
                 "Severity": (
-                    fields.get("JiraFields.SEVERITY", {}).get("value")
-                    if fields.get("JiraFields.SEVERITY")
+                    fields.get(JiraFields.SEVERITY, {}).get("value")
+                    if fields.get(JiraFields.SEVERITY)
                     else None
                 ),
             }

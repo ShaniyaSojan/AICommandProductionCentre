@@ -6,6 +6,7 @@ from api.project_routes import router as project_router
 from api.jira_routes import router as jira_router
 from api.ticket_routes import router as ticket_router
 from api.sync_routes import router as sync_router
+from api.dashboard_routes import router as dashboard_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Application Started")
@@ -22,3 +23,4 @@ app.include_router(project_router)
 app.include_router(jira_router)
 app.include_router(ticket_router)
 app.include_router(sync_router)
+app.include_router(dashboard_router)

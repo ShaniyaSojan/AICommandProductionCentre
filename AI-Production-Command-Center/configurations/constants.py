@@ -30,28 +30,27 @@ class JiraFields:
 
 class JiraStatus:
 
-    OPEN = "Open"
-    IN_PROGRESS = "In Progress"
-    READY_FOR_QA = "READY FOR QA"
-    UAT = "UAT"
-    REOPENED = "Reopened"
 
     CLOSED = "Closed"
     DONE = "Done"
     RESOLVED = "Resolved"
+    REJECTED = "Rejected"
+    DUPLICATE = "Duplicate"
 
     CLOSED_STATUS = [
         CLOSED,
         DONE,
-        RESOLVED
+        RESOLVED,
+        REJECTED,
+        DUPLICATE
     ]
 
     ACTIVE_STATUS = [
-        OPEN,
-        IN_PROGRESS,
-        READY_FOR_QA,
-        UAT,
-        REOPENED
+        "Open",
+        "DEV - IN PROGRESS",
+        "CODE REVIEW",
+        "READY FOR QA",
+        "IN QA TESTING",
     ]
 
 
@@ -61,10 +60,11 @@ class JiraStatus:
 
 class JiraPriority:
 
-    P1 = "P1 - Critical"
+    P0 = "P0 - Critical"
+    P1 = "P1 - High"
     P2 = "P2 - Medium"
     P3 = "P3 - Low"
-    P4 = "P4 - Minor"
+
 
 
 # ===========================================================
@@ -73,10 +73,10 @@ class JiraPriority:
 
 class JiraSeverity:
 
-    CRITICAL = "Critical"
-    HIGH = "High"
-    MEDIUM = "Medium"
-    LOW = "Low"
+    Sev0 = "Critical"
+    Sev1 = "High"
+    Sev2 = "Medium"
+    Sev3 = "Low"
 
 
 # ===========================================================
@@ -98,7 +98,7 @@ class TicketType:
 
 class Dashboard:
 
-    SLA_WARNING_HOURS = 20
+    SLA_WARNING_HOURS = 24
 
     REFRESH_INTERVAL = 60
 
